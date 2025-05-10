@@ -24,8 +24,12 @@ public class App extends JPanel {
         super.paint(g);
         g.setColor(Color.CYAN);
         g.fillOval(x, y, 20, 20);
+        g.setColor(Color.BLACK);
+        g.fillRect(25, 25, 10, 100);
+    
     }
 
+    
 
     public int velocity()
     {
@@ -42,7 +46,7 @@ public class App extends JPanel {
     public int gravity()
     {
 
-        gravity = Math.round(1.0f/(getHeight()-y));
+        gravity = Math.round(1.0f/(getHeight()-y)*(getHeight()-y));
         
         
          return (int)gravity;
@@ -53,7 +57,20 @@ public class App extends JPanel {
     private void wallCollision() {
         lastTime = System.currentTimeMillis();
 
-        gravity();
+        
+        
+       
+        // for some reason the ball is not bouncing off the walls and velocity on the x axis is overpowering the gravity on the y axis
+        angleX += velocity();
+        angleY -= gravity()*velocity();
+
+
+        //angleY += gravity();
+        
+        // this seems to work closer to what I want but the ball is not bouncing off the floor and the x axis is still attracting to one side
+        //x += angleX + velocity();
+        //y += angleY + gravity();
+        
         if(x + angleX < 5 ||x + angleX > getWidth() -15 ) 
         {
             //angleX = velocity();
@@ -64,15 +81,8 @@ public class App extends JPanel {
             //angleY += velocity();
             angleY  *= -1;
         } 
-       
-        angleX += velocity();
-        angleY += gravity();
         x += angleX;
-        
         y += angleY;
-        
-        
-
     }
         
     
@@ -93,9 +103,10 @@ public class App extends JPanel {
         frame.add(app);
 
         while (true) {
+            
             app.wallCollision(); // Move the app to the top-left corner of the window
             app.repaint(); // Repaint the app to update the graphics
-            Thread.sleep(1000 / 60); // Limit to 60 FPS
+            Thread.sleep(1000 / 20); // Limit to 60 FPS
 
         
         
