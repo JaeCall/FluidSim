@@ -7,7 +7,7 @@ import java.awt.Graphics;
 
 public class App extends JPanel {
 
-    int gravity;
+    float gravity;
     public int x=300;
     public int y=300;
     public int angleX ;
@@ -15,6 +15,9 @@ public class App extends JPanel {
     public int velocity;
     float now;
     float lastTime;
+    float deltaTime;
+    float vx = 0;
+    float vy = 0;
     
 
     public void paint(Graphics g) {
@@ -26,48 +29,44 @@ public class App extends JPanel {
 
     public int velocity()
     {
+        
         now = System.currentTimeMillis();
-        velocity = (int)(((x - angleX) + (y - angleY))/ ((now - lastTime)/1000)) ;
+        deltaTime = (now - lastTime) / 1000;
+        vx = (x - angleX)/deltaTime;
+        vy = (y - angleY)/deltaTime;
+        velocity = (int) Math.sqrt(vx*vx + vy*vy);
+        
         return velocity;
     }
     
-    public void gravity()
+    public int gravity()
     {
-        gravity = 2;
-        
-        
-         //angleY = ((y - getHeight())*-1) / gravity;
-         angleY = gravity*(velocity())/(y - getHeight())*-1;
 
+        gravity = Math.round(1.0f/(getHeight()-y));
+        
+        
+         return (int)gravity;
 
 
     }
 
     private void wallCollision() {
         lastTime = System.currentTimeMillis();
+
         gravity();
-        if(x + angleX < 5) 
+        if(x + angleX < 5 ||x + angleX > getWidth() -15 ) 
         {
-            angleX += velocity();
+            //angleX = velocity();
             angleX *= -1;
-
-        } else if(x + angleX > getWidth() -15)
-        {
-            angleX += velocity();
-            angleX *= -1; 
-
-        }else if(y + angleY < 5)
-        {
-            angleY += velocity();
-            angleY  *= -1;
-
-        } else if(y + angleY >  getHeight() -15)
-        {
-            angleY += velocity();
-            angleY*= -1;
         }
+        else if(y + angleY < 5|| y + angleY >  getHeight() -15)
+        {
+            //angleY += velocity();
+            angleY  *= -1;
+        } 
        
-        
+        angleX += velocity();
+        angleY += gravity();
         x += angleX;
         
         y += angleY;
@@ -96,7 +95,7 @@ public class App extends JPanel {
         while (true) {
             app.wallCollision(); // Move the app to the top-left corner of the window
             app.repaint(); // Repaint the app to update the graphics
-            Thread.sleep(1000 / 30); // Limit to 60 FPS
+            Thread.sleep(1000 / 60); // Limit to 60 FPS
 
         
         
